@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "wine": {
+      "title": "Wine",
+      "description": "Wine item in the collection",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the wine" },
+        "type": { "type": "string", "description": "Type of wine (e.g., Red Dry)" },
+        "year": { "type": "string", "description": "Year of production" },
+        "grapes": { "type": "string", "description": "Grape varieties" },
+        "desc": { "type": "string", "description": "Description of the wine" },
+        "price": { "type": "string", "description": "Price per bottle" },
+        "imageUrl": { "type": "string", "description": "URL to the wine image" },
+        "createdAt": { "type": "timestamp", "description": "Creation timestamp" },
+        "updatedAt": { "type": "timestamp", "description": "Last update timestamp" }
+      },
+      "required": ["name", "type", "year", "grapes", "desc", "price", "imageUrl", "createdAt", "updatedAt"]
+    },
+    "news": {
+      "title": "News",
+      "description": "A news article or journal entry",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the news" },
+        "date": { "type": "string", "description": "Date string for display" },
+        "preview": { "type": "string", "description": "Short preview text" },
+        "content": { "type": "string", "description": "Full content of the news" },
+        "image": { "type": "string", "description": "URL to the news image" },
+        "createdAt": { "type": "timestamp", "description": "Creation timestamp" },
+        "updatedAt": { "type": "timestamp", "description": "Last update timestamp" }
+      },
+      "required": ["title", "date", "preview", "content", "image", "createdAt", "updatedAt"]
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "Admin user profile for RBAC",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Email of the admin user" },
+        "createdAt": { "type": "timestamp", "description": "Record creation timestamp" }
+      },
+      "required": ["email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "wines": {
+      "schema": { "$ref": "#/entities/wine" },
+      "description": "Collection of wines to display on the Wines page"
+    },
+    "news": {
+      "schema": { "$ref": "#/entities/news" },
+      "description": "Collection of news to display on the News page"
+    },
+    "admins": {
+      "schema": { "$ref": "#/entities/admin" },
+      "description": "Whitelist of administrative user IDs allowed to manage content"
+    }
+  }
+}
