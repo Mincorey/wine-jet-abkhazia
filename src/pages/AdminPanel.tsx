@@ -246,8 +246,9 @@ export function AdminPanel() {
                 <input name="title" required defaultValue={editingItem?.title} className="w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif" /></div>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Дата*</label>
+                <div className="w-full">
                 <Popover>
-                  <PopoverTrigger asChild>
+                  <PopoverTrigger asChild className="w-full">
                     <button
                       type="button"
                       className={cn(
@@ -255,10 +256,12 @@ export function AdminPanel() {
                         !(newsDate || editingItem?.date) && "text-foreground/30"
                       )}
                     >
-                      {newsDate
-                        ? format(newsDate, "LLLL yyyy", { locale: ru }).replace(/^./, c => c.toUpperCase())
-                        : (editingItem?.date || "Выберите дату")}
-                      <CalendarIcon size={14} strokeWidth={1} className="text-foreground/40 ml-2 shrink-0" />
+                      <span>
+                        {newsDate
+                          ? format(newsDate, "LLLL yyyy", { locale: ru }).replace(/^./, c => c.toUpperCase())
+                          : (editingItem?.date || "Выберите дату")}
+                      </span>
+                      <CalendarIcon size={14} strokeWidth={1} className="text-foreground/40 shrink-0" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 border border-black/5 rounded-none shadow-md font-sans z-50" align="start">
@@ -272,6 +275,7 @@ export function AdminPanel() {
                     />
                   </PopoverContent>
                 </Popover>
+                </div>
               </div>
               <div className="space-y-2"><label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Изображение</label>
                 <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-sans" />
