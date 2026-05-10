@@ -21,13 +21,13 @@ export function Home() {
   return (
     <div className="flex flex-col w-full">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-[100dvh] min-h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <img 
-            src="/images/hero.jpg" 
-            alt="Vineyards in mist" 
-            className="w-full h-full object-cover"
+          <img
+            src="/images/hero.jpg"
+            alt="Vineyards in mist"
+            className="w-full h-full object-cover object-center scale-105"
           />
         </div>
 

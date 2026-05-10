@@ -37,17 +37,20 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out pb-3",
           useDarkNav
-            ? "bg-background/90 backdrop-blur-md border-b border-black/5 py-3"
-            : "bg-transparent py-4"
+            ? "bg-background/90 backdrop-blur-md border-b border-black/5"
+            : "bg-transparent"
         )}
+        style={{
+          paddingTop: `calc(env(safe-area-inset-top, 0px) + ${useDarkNav ? "0.75rem" : "1rem"})`
+        }}
       >
-        <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 flex items-center justify-between gap-4">
           <Link
             to="/"
             className={cn(
-              "text-2xl font-serif transition-colors",
+              "font-serif transition-colors whitespace-nowrap shrink-0 text-xl lg:text-2xl",
               useDarkNav ? "text-foreground" : "text-white"
             )}
           >
@@ -55,13 +58,13 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-10">
+          <nav className="hidden md:flex items-center space-x-5 lg:space-x-8 xl:space-x-10">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.name}
                 to={link.href}
                 className={cn(
-                  "text-[11px] uppercase tracking-widest transition-colors relative group",
+                  "text-[10px] lg:text-[11px] uppercase tracking-widest transition-colors relative group",
                   useDarkNav ? "text-foreground/70 hover:text-primary" : "text-white/80 hover:text-white"
                 )}
               >
