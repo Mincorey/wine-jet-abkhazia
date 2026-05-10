@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "motion/react";
 import { supabase, rowToWine, Wine } from "../supabase";
 
 export function Wines() {
   const [wines, setWines] = useState<Wine[]>([]);
   const [loading, setLoading] = useState(true);
+  const { hash } = useLocation();
 
   useEffect(() => {
     const fetchWines = async () => {
@@ -24,6 +25,22 @@ export function Wines() {
     };
     fetchWines();
   }, []);
+
+  // Прокрутка к вину по якорю после загрузки данных
+  useEffect(() => {
+    if (!hash || loading) return;
+    const id = hash.replace("#", "");
+    // Небольшая задержка — дать время React отрендерить карточки
+    const timer = setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        const offset = 100; // высота навбара
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [hash, loading]);
 
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 container mx-auto">
