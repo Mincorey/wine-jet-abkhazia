@@ -1,5 +1,11 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "motion/react";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "../context/AuthContext";
 import { supabase, signInWithUsername, signOut, uploadImage, rowToWine, rowToNewsItem } from "../supabase";
 
@@ -12,13 +18,18 @@ export function AdminPanel() {
   const [uploadedImageBase64, setUploadedImageBase64] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [newsDate, setNewsDate] = useState<Date | undefined>(undefined);
+  const [formKey, setFormKey] = useState(0);
 
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
 
-  useEffect(() => { setUploadedImageBase64(null); }, [activeTab, editingItem]);
+  useEffect(() => {
+    setUploadedImageBase64(null);
+    setNewsDate(undefined);
+  }, [activeTab, editingItem]);
 
   const handleEditClick = (item: any) => {
     setEditingItem(item);
@@ -123,7 +134,11 @@ export function AdminPanel() {
           : await supabase.from("wines").insert(wineData);
         if (error) throw error;
       } else {
-        const newsData = { title: String(data.title), date: String(data.date), preview: String(data.preview),
+        const dateStr = newsDate
+          ? format(newsDate, "LLLL yyyy", { locale: ru }).replace(/^./, c => c.toUpperCase())
+          : (editingItem?.date ?? "");
+        if (!dateStr) { alert("Выберите дату публикации"); return; }
+        const newsData = { title: String(data.title), date: dateStr, preview: String(data.preview),
           content: String(data.content), image: imageUrl ?? (editingItem ? editingItem.image : "/images/news1.jpg") };
         const { error } = editingItem
           ? await supabase.from("news").update(newsData).eq("id", editingItem.id)
@@ -133,6 +148,8 @@ export function AdminPanel() {
       await fetchItems();
       setEditingItem(null);
       setUploadedImageBase64(null);
+      setNewsDate(undefined);
+      if (!editingItem) setFormKey(k => k + 1);
     } catch (error: any) { alert("Ошибка: " + error.message); }
   };
 
@@ -205,7 +222,7 @@ export function AdminPanel() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-1 border border-black/5 p-8 bg-secondary/20">
           <h3 className="font-serif text-2xl mb-6">{editingItem ? "Редактировать" : "Добавить"} {activeTab === "wines" ? "вино" : "новость"}</h3>
-          <form key={editingItem?.id || "new"} onSubmit={handleCreateOrUpdate} className="space-y-4">
+          <form key={editingItem?.id ?? formKey} onSubmit={handleCreateOrUpdate} className="space-y-4">
             {activeTab === "wines" && (<>
               <div className="space-y-2"><label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Название*</label>
                 <input name="name" required defaultValue={editingItem?.name} className="w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif" placeholder="Резерв Качич" /></div>
@@ -227,8 +244,35 @@ export function AdminPanel() {
             {activeTab === "news" && (<>
               <div className="space-y-2"><label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Заголовок*</label>
                 <input name="title" required defaultValue={editingItem?.title} className="w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif" /></div>
-              <div className="space-y-2"><label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Дата*</label>
-                <input name="date" required defaultValue={editingItem?.date} className="w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif" placeholder="Октябрь 2023" /></div>
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Дата*</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif text-left inline-flex items-center justify-between hover:border-black/20 transition-colors",
+                        !(newsDate || editingItem?.date) && "text-foreground/30"
+                      )}
+                    >
+                      {newsDate
+                        ? format(newsDate, "LLLL yyyy", { locale: ru }).replace(/^./, c => c.toUpperCase())
+                        : (editingItem?.date || "Выберите дату")}
+                      <CalendarIcon size={14} strokeWidth={1} className="text-foreground/40 ml-2 shrink-0" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 border border-black/5 rounded-none shadow-md font-sans z-50" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={newsDate}
+                      onSelect={setNewsDate}
+                      initialFocus
+                      locale={ru}
+                      className="bg-card text-foreground"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
               <div className="space-y-2"><label className="text-[10px] uppercase tracking-widest text-foreground/60 font-semibold">Изображение</label>
                 <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-sans" />
                 {isUploading && <p className="text-xs text-primary">Загрузка...</p>}
