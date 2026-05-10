@@ -251,7 +251,7 @@ export function AdminPanel() {
                     <button
                       type="button"
                       className={cn(
-                        "w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif text-left inline-flex items-center justify-between hover:border-black/20 transition-colors",
+                        "w-full bg-white px-4 py-2 border border-black/10 outline-none text-sm font-serif text-left flex items-center justify-between hover:border-black/20 transition-colors",
                         !(newsDate || editingItem?.date) && "text-foreground/30"
                       )}
                     >
