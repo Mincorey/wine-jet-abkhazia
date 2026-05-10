@@ -1,8 +1,23 @@
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { supabase, rowToWine, type Wine } from "../supabase";
 
 export function Home() {
+  const [featuredWines, setFeaturedWines] = useState<Wine[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("wines")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(3)
+      .then(({ data }) => {
+        if (data) setFeaturedWines(data.map(rowToWine));
+      });
+  }, []);
+
   return (
     <div className="flex flex-col w-full">
       {/* Hero Section */}
@@ -120,48 +135,55 @@ export function Home() {
             <div className="w-16 h-[1px] bg-foreground/20"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((item, i) => (
-              <motion.div 
-                key={item}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: i * 0.2 }}
-                className="group cursor-pointer flex flex-col"
-              >
-                <div className="bg-[#EADDCD] aspect-[3/4] flex items-center justify-center relative group overflow-hidden mb-8 shadow-sm">
-                  <img 
-                    src={
-                      item === 1 ? "/images/wine1.jpg" :
-                      item === 2 ? "/images/wine3.jpg" :
-                      "/images/wine4.jpg"
-                    }
-                    alt={
-                      item === 1 ? "Мальбек Резерв" : 
-                      item === 2 ? "Калдахуарский Рислинг" : 
-                      "Поздний Сбор"
-                    }
-                    className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-700"></div>
+          {featuredWines.length === 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[0, 1, 2].map(i => (
+                <div key={i} className="flex flex-col">
+                  <div className="bg-[#EADDCD] aspect-[3/4] animate-pulse mb-8" />
+                  <div className="h-4 bg-black/10 rounded animate-pulse mx-auto w-2/3 mb-3" />
+                  <div className="h-3 bg-black/5 rounded animate-pulse mx-auto w-1/2" />
                 </div>
-                <div className="text-center">
-                  <h3 className="font-serif text-2xl mb-3 text-foreground group-hover:text-primary transition-colors">
-                    {item === 1 ? "Мальбек Резерв" : item === 2 ? "Калдахуарский Рислинг" : "Поздний Сбор"}
-                  </h3>
-                  <p className="text-base font-sans text-foreground/60 tracking-wide mb-4 leading-relaxed max-w-[280px] mx-auto">
-                     {item === 1 ? "Глубокий, насыщенный, с нотами черной смородины." : item === 2 ? "Свежий, минеральный, с оттенками белых цветов." : "Редкий, сладкий, с ароматом медовых сот и абрикоса."}
-                  </p>
-                  <Link to="/wines" className="text-primary text-xs uppercase tracking-widest hover:underline transition-all inline-flex items-center space-x-2">
-                    <span>Подробнее</span>
-                    <ArrowRight size={14} />
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredWines.map((wine, i) => (
+                <motion.div
+                  key={wine.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: i * 0.2 }}
+                  className="group cursor-pointer flex flex-col"
+                >
+                  <div className="bg-[#EADDCD] aspect-[3/4] relative overflow-hidden mb-8 shadow-sm">
+                    <img
+                      src={wine.imageUrl}
+                      alt={wine.name}
+                      className="w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-1000"
+                    />
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-700" />
+                  </div>
+                  <div className="text-center">
+                    <span className="text-primary text-[10px] uppercase tracking-widest mb-2 block">{wine.type} · {wine.year}</span>
+                    <h3 className="font-serif text-2xl mb-3 text-foreground group-hover:text-primary transition-colors">
+                      {wine.name}
+                    </h3>
+                    <p className="text-sm font-sans text-foreground/60 mb-5 leading-relaxed max-w-[260px] mx-auto line-clamp-2">
+                      {wine.desc}
+                    </p>
+                    <Link
+                      to={`/wines#${wine.id}`}
+                      className="text-primary text-xs uppercase tracking-widest hover:underline transition-all inline-flex items-center space-x-2"
+                    >
+                      <span>Подробнее</span>
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

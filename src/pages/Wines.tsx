@@ -54,6 +54,7 @@ export function Wines() {
           {wines.map((wine, i) => (
             <motion.div
               key={wine.id}
+              id={wine.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
