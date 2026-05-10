@@ -11,7 +11,7 @@ export function AdminPanel() {
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [uploadedImageBase64, setUploadedImageBase64] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
 
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -141,12 +141,46 @@ export function AdminPanel() {
       const { error } = await supabase.from(activeTab).delete().eq("id", id);
       if (error) throw error;
       setItems(prev => prev.filter(item => item.id !== id));
-      setConfirmDeleteId(null);
+      setDeleteTarget(null);
     } catch (error: any) { console.error(error.message); }
   };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen pt-32 pb-20 px-6 container mx-auto">
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6" onClick={() => setDeleteTarget(null)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="bg-[#FDFBF7] max-w-sm w-full p-8 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-10 h-[1px] bg-red-700/40 mb-6" />
+            <h3 className="font-serif text-2xl mb-2 text-foreground">Удалить запись?</h3>
+            <p className="text-sm text-foreground/60 mb-2 font-sans leading-relaxed">
+              «{deleteTarget.name || deleteTarget.title}»
+            </p>
+            <p className="text-xs text-foreground/40 font-sans mb-8">Это действие необратимо.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 border border-black/20 text-foreground text-xs uppercase tracking-widest py-4 hover:bg-black/5 transition-colors"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={() => handleDelete(deleteTarget.id)}
+                className="flex-1 bg-red-700 text-white text-xs uppercase tracking-widest py-4 hover:bg-red-800 transition-colors active:scale-95"
+              >
+                Удалить
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-12">
         <div>
           <h1 className="text-4xl font-serif text-foreground mb-2">Административная панель</h1>
@@ -235,10 +269,9 @@ export function AdminPanel() {
                   </div>
                   <div className="flex items-center space-x-4 shrink-0">
                     <button onClick={() => handleEditClick(item)} className="text-[10px] uppercase font-semibold text-foreground/60 tracking-widest hover:text-primary transition-colors">Редактировать</button>
-                    <button onClick={() => confirmDeleteId === item.id ? handleDelete(item.id) : setConfirmDeleteId(item.id)}
-                      onMouseLeave={() => setConfirmDeleteId(null)}
-                      className={"text-[10px] uppercase font-semibold tracking-widest transition-colors " + (confirmDeleteId === item.id ? "text-white bg-red-700 px-3 py-1 rounded" : "text-red-700/60 hover:text-red-700")}>
-                      {confirmDeleteId === item.id ? "Точно?" : "Удалить"}
+                    <button onClick={() => setDeleteTarget(item)}
+                      className="text-[10px] uppercase font-semibold tracking-widest text-red-700/60 hover:text-red-700 transition-colors">
+                      Удалить
                     </button>
                   </div>
                 </div>
