@@ -132,7 +132,6 @@ export function AdminPanel() {
       }
       await fetchItems();
       setEditingItem(null);
-      e.currentTarget.reset();
       setUploadedImageBase64(null);
     } catch (error: any) { alert("Ошибка: " + error.message); }
   };
