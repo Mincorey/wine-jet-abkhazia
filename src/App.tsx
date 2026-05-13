@@ -4,6 +4,7 @@
  */
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import { Layout } from "./components/layout/Layout";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { Home } from "./pages/Home";
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="*" element={<PlaceholderPage title="Страница не найдена" />} />
           </Route>
         </Routes>
+        <Analytics />
       </Router>
     </AuthProvider>
   );
